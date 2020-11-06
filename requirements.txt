@@ -1,0 +1,11 @@
+asgiref==3.3.0
+certifi==2020.6.20
+chardet==3.0.4
+django==3.0.11
+idna==2.10
+pillow==8.0.0
+pytz==2020.4
+requests==2.24.0
+sorl-thumbnail==12.6.3
+sqlparse==0.4.1
+urllib3==1.25.11
