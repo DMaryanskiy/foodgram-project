@@ -28,6 +28,7 @@ function Ingredients() {
     const dropdown = (e) => {
         if (e.target.classList.contains('form__item-list')) {
             nameIngredient.value = e.target.textContent;
+            nameIngredient.setAttribute('data-id', e.target.getAttribute('data-id'));
             formDropdownItems.style.display = ''
             cantidadVal.textContent = e.target.getAttribute('data-val');
         }
@@ -36,13 +37,15 @@ function Ingredients() {
     const addIngredient = (e) => {
         if(nameIngredient.value && cantidad.value) {
             const data = getValue();
+            if (!Boolean(data.id)) {
+                return;
+            }
             const elem = document.createElement('div');
             elem.classList.add('form__field-item-ingredient');
             elem.id = `ing_${cur}`;
             elem.innerHTML = `<span> ${data.name} ${data.value}${data.units}</span> <span class="form__field-item-delete"></span>
-                             <input id="nameIngredient_${cur}" name="nameIngredient_${cur}" type="hidden" value="${data.name}">
-                             <input id="valueIngredient_${cur}" name="valueIngredient_${cur}" type="hidden" value="${data.value}">
-                             <input id="unitsIngredient_${cur}" name="unitsIngredient_${cur}" type="hidden" value="${data.units}">`;
+                              <input id="idIngredient_${cur}" name="idIngredient_${cur}" type="hidden" value="${data.id}">
+                              <input id="valueIngredient_${cur}" name="valueIngredient_${cur}" type="hidden" value="${data.value}">`;
             cur++;
             
             ingredientsContainer.appendChild(elem);
@@ -63,7 +66,8 @@ function Ingredients() {
         const data = {
             name: nameIngredient.value,
             value: cantidad.value,
-            units: cantidadVal.textContent
+            units: cantidadVal.textContent,
+            id: nameIngredient.getAttribute('data-id'),
         };
         clearValue(nameIngredient);
         clearValue(cantidad);
@@ -85,7 +89,7 @@ const cbEventInput = (elem) => {
     return api.getIngredients(elem.target.value).then( e => {
         if(e.length !== 0 ) {
             const items = e.map( elem => {
-                return `<a class="form__item-list" data-val="${elem.dimension}"">${elem.title}</a>`
+                return `<a class="form__item-list" data-id="${elem.id}" data-val="${elem.dimension}">${elem.title}</a>`
             }).join(' ')
             formDropdownItems.style.display = 'flex';
             formDropdownItems.innerHTML = items;
