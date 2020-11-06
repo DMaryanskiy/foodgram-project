@@ -8,6 +8,11 @@ from .models import (
 )
 
 
+class IngredientsReceipeInLine(admin.TabularInline):
+    model = IngredientsReceipe
+    extra = 1
+
+
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
@@ -15,6 +20,7 @@ class IngredientsAdmin(admin.ModelAdmin):
         "dimension",
     )
     list_filter = ("title", )
+    inlines = (IngredientsReceipeInLine, )
 
 
 class IngredientsReceipeAdmin(admin.ModelAdmin):
@@ -42,6 +48,7 @@ class ReceipeAdmin(admin.ModelAdmin):
         "title",
         "tag",
     )
+    inlines = (IngredientsReceipeInLine, )
 
 admin.site.register(Ingredients, IngredientsAdmin)
 admin.site.register(IngredientsReceipe, IngredientsReceipeAdmin)
