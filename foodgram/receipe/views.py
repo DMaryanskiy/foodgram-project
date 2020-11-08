@@ -19,7 +19,7 @@ def ingredients(request):
 
 def index(request):
     receipe_list = Receipe.objects.order_by("-pub_date").all()
-    paginator = Paginator(receipe_list, 10)
+    paginator = Paginator(receipe_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(
@@ -58,3 +58,13 @@ def add_receipe(request):
     return render(request, "receipeform.html", {
         "form" : form,
     })
+
+"""def profile(request):
+    user = request.user
+    author = get_object_or_404(User, username=username)
+    recipe = Receipe.objects.filter(author=author)
+    recipe_list = recipe.order_by("-pub_date")
+    paginator = Paginator(recipe_list, 6)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    return """
