@@ -19,13 +19,15 @@ class IngredientsReceipe(models.Model):
         return f'{self.ingredient.title} {self.amount} {self.ingredient.dimension}'
 
 
-class Tag(models.Model):
+"""class Tag(models.Model):
     name = models.CharField(max_length=10)
-    slug = models.SlugField(max_length=10, null=True, blank=True)
+    slug = models.SlugField(max_length=10)
+    color = models.CharField(max_length=20)
+    value = models.IntegerField(default=1)
 
     def __str__(self):
         return "%s" % (self.name)
-
+"""
 
 class Receipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
@@ -34,5 +36,9 @@ class Receipe(models.Model):
     image = models.ImageField(upload_to="receipe/")
     descriptions = models.TextField()
     ingredient_list = models.ManyToManyField("Ingredients", through="IngredientsReceipe")
-    tag = models.ManyToManyField("Tag", related_name="tag")
+    # tag = models.ManyToManyField("Tag", related_name="tag")
     cooking_time = models.PositiveIntegerField()
+
+    breakfast = models.BooleanField(default=False, verbose_name="Завтрак")
+    lunch = models.BooleanField(default=False, verbose_name="Обед")
+    dinner = models.BooleanField(default=False, verbose_name="Ужин")

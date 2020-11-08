@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import (
     Ingredients,
     IngredientsReceipe,
-    Tag,
     Receipe
 )
 
@@ -30,14 +29,6 @@ class IngredientsReceipeAdmin(admin.ModelAdmin):
         "amount",
     )
 
-
-class TagAdmin(admin.ModelAdmin):
-    list_display = (
-        "pk",
-        "name",
-    )
-
-
 class ReceipeAdmin(admin.ModelAdmin):
     list_display = (
         "title",
@@ -46,11 +37,9 @@ class ReceipeAdmin(admin.ModelAdmin):
     list_filter = (
         "author",
         "title",
-        "tag",
     )
     inlines = (IngredientsReceipeInLine, )
 
 admin.site.register(Ingredients, IngredientsAdmin)
 admin.site.register(IngredientsReceipe, IngredientsReceipeAdmin)
-admin.site.register(Tag, TagAdmin)
 admin.site.register(Receipe, ReceipeAdmin)
