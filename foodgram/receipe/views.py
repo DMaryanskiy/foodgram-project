@@ -59,7 +59,7 @@ def add_receipe(request):
         "form" : form,
     })
 
-"""def profile(request):
+def profile(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
     recipe = Receipe.objects.filter(author=author)
@@ -67,4 +67,18 @@ def add_receipe(request):
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return """
+    return render(request, "profile.html", {
+        "author" : author,
+        "page" : page,
+        "paginator" : paginator,
+    })
+
+def recipe_view(request, username, recipe_id):
+    author = get_object_or_404(User, username=username)
+    recipe = get_object_or_404(Receipe, pk=recipe_id, author=author)
+    ingredients = IngredientsReceipe.objects.filter(receipe=recipe)
+    return render(request, "single_recipe.html", {
+        "recipe" : recipe,
+        "username" : author,
+        "ingredients" : ingredients
+    })

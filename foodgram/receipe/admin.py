@@ -11,7 +11,7 @@ class IngredientsReceipeInLine(admin.TabularInline):
     model = IngredientsReceipe
     extra = 1
 
-
+@admin.register(Ingredients)
 class IngredientsAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
@@ -40,6 +40,5 @@ class ReceipeAdmin(admin.ModelAdmin):
     )
     inlines = (IngredientsReceipeInLine, )
 
-admin.site.register(Ingredients, IngredientsAdmin)
 admin.site.register(IngredientsReceipe, IngredientsReceipeAdmin)
 admin.site.register(Receipe, ReceipeAdmin)
