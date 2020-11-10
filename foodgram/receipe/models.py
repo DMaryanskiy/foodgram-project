@@ -42,3 +42,8 @@ class Receipe(models.Model):
     breakfast = models.BooleanField(default=False, verbose_name="Завтрак")
     lunch = models.BooleanField(default=False, verbose_name="Обед")
     dinner = models.BooleanField(default=False, verbose_name="Ужин")
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="follower")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")

@@ -33,9 +33,21 @@
 
         </div>
 <!--        <p style="padding: 0 0 2em 0;"><a class="button button_style_light-blue" href="#">Подписаться на автора</a></p>-->
+        {% if following %}
         <div class="author-subscribe" data-author="323">
-            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+                <a href="{% url 'profile_unfollow' author.username %}" role="button">
+                Отписаться от автора
+            </a></button></p>
         </div>
+        {% else %}
+        <div class="author-subscribe" data-author="323">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+                <a href="{% url 'profile_follow' author.username %}" role="button">
+                Подписаться на автора
+            </a></button></p>
+        </div>
+        {% endif %}
         <div class="card-list" >
         {% for recipe in page %}
             {% include "recipe_item.html" with recipe=recipe %}

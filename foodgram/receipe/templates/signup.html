@@ -27,6 +27,9 @@
                 <div class="form__field-group">
                     <!--input type="text" name="first_name" id="id_first_name" class="form__input"-->
                     {{ field|addclass:"form__input" }}
+                {% if field.help_text %}
+                    <span class="form__input-info">{{ field.help_text|safe }}</span>
+                {% endif %}
                 {% if form.errors %}
                     {% for error in field.errors %}
                     <span class="form__error">{{ error|escape }}</span>
