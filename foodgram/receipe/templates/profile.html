@@ -14,6 +14,7 @@
       {% include "nav.html" with index=True %}
   </header>
     <main class="main container">
+        {% csrf_token %}
         <div class="main__header">
             <h1 class="main__title">{{ author.first_name }}</h1>
             <ul class="tags">
@@ -34,18 +35,12 @@
         </div>
 <!--        <p style="padding: 0 0 2em 0;"><a class="button button_style_light-blue" href="#">Подписаться на автора</a></p>-->
         {% if following %}
-        <div class="author-subscribe" data-author="323">
-            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
-                <a href="{% url 'profile_unfollow' author.username %}" role="button">
-                Отписаться от автора
-            </a></button></p>
+        <div class="author-subscribe" data-author="{{author.pk}}">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Отписаться от автора</button></p>
         </div>
         {% else %}
-        <div class="author-subscribe" data-author="323">
-            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
-                <a href="{% url 'profile_follow' author.username %}" role="button">
-                Подписаться на автора
-            </a></button></p>
+        <div class="author-subscribe" data-author="{{author.pk}}">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
         </div>
         {% endif %}
         <div class="card-list" >

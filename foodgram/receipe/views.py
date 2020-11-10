@@ -94,19 +94,16 @@ def recipe_view(request, username, recipe_id):
 @login_required
 def follow_index(request):
     follow = Follow.objects.filter(user=request.user)
-    authors_list = follow.values_list("author")
     cnt = {}
-    for author in authors_list:
-        amount = Receipe.objects.filter(author=author).count()
-        cnt[author] = amount
-    recipe_list = Receipe.objects.filter(author__in=authors_list).order_by("-pub_date")
-    paginator = Paginator(authors_list, 3)
+    for author in follow:
+        amount = Receipe.objects.filter(author=author.author).count()
+        cnt[author.author] = amount
+    paginator = Paginator(follow, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(request, "follow.html", {
             "page" : page,
             "paginator" : paginator,
-            "author_list" : authors_list,
             "cnt" : cnt,
         }
     )

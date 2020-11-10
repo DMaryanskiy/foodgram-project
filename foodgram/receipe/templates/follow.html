@@ -1,5 +1,7 @@
 <!doctype html>
 {% load static %}
+{% load thumbnail %}
+{% load user_filters %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,40 +16,31 @@
     {% include "nav.html" with follow=True %}
 </header>
 <main class="main container">
+    {% csrf_token %}
     <div class="main__header">
         <h1 class="main__title">Мои подписки</h1>
     </div>
-    {% for author in page %}
+    {% for follow in page %}
     <div class="card-list">
-        <div class="card-user" data-author="700">
+        <div class="card-user" data-author="{{ follow.author.pk }}">
         <div class="card-user__header">
-            <h2 class="card-user__title">{{author.first_name}}</h2>
+            <h2 class="card-user__title">{{ follow.author.first_name }}</h2>
         </div>
         <div class="card-user__body">
             <ul class="card-user__items">
+                {% for recipe in follow.author|get_recipes %}
                 <li class="card-user__item">
                     <div class="recipe">
-                        <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image">
-                        <h3 class="recipe__title">Французские тосты</h3>
-                        <p class="recipe__text"><span class="icon-time"></span> 20 мин.</p>
+                        {% thumbnail recipe.image "1920x1080" upscale=True as im %}
+                        <img src="{{ im.url }}" alt="какой-то-текст" class="recipe__image">
+                        {% endthumbnail %}
+                        <h3 class="recipe__title">{{ recipe.title }}</h3>
+                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     </div>
                 </li>
+                {% endfor %}
                 <li class="card-user__item">
-                    <div class="recipe">
-                        <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image">
-                        <h3 class="recipe__title">Французские тосты</h3>
-                        <p class="recipe__text"><span class="icon-time"></span> 20 мин.</p>
-                    </div>
-                </li>
-                <li class="card-user__item">
-                    <div class="recipe">
-                        <img src="./images/testCardImg.png" alt="какой-то-текст" class="recipe__image">
-                        <h3 class="recipe__title">Французские тосты</h3>
-                        <p class="recipe__text"><span class="icon-time"></span> 20 мин.</p>
-                    </div>
-                </li>
-                <li class="card-user__item">
-                    <a href="#" class="card-user__link link">Еще {{cnt.author}} рецептов...</a>
+                    <a href="{% url 'profile' follow.author %}" class="card-user__link link">{{ follow.author|get_count_recipes }}</a>
                 </li>
             </ul>
         </div>
@@ -56,8 +49,8 @@
         </div>
     </div>
     {% endfor %}
-    {% include "paginator.html" %}
 </main>
+{% include "paginator.html" %}
 {% include "footer.html" %}
 <script src="{% static '/js/config/config.js' %}"></script>
 <script src="{% static '/js/components/MainCards.js' %}"></script>

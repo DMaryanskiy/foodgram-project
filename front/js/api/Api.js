@@ -3,10 +3,18 @@ class Api {
     constructor(apiUrl) {
         this.apiUrl =  apiUrl;
     }
+  getToken () {
+    if (document.getElementsByName('csrfmiddlewaretoken').length > 0) {
+      return document.getElementsByName('csrfmiddlewaretoken')[0].value    
+    } else {
+      return ''
+    }
+  }
   getPurchases () {
     return fetch(`/purchases`, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       }
     })
       .then( e => {
@@ -20,7 +28,8 @@ class Api {
     return fetch(`/purchases`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       },
       body: JSON.stringify({
         id: id
@@ -37,7 +46,8 @@ class Api {
     return fetch(`/purchases/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       }
     })
       .then( e => {
@@ -51,7 +61,8 @@ class Api {
     return fetch(`/subscriptions`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       },
       body: JSON.stringify({
         id: id
@@ -68,7 +79,8 @@ class Api {
     return fetch(`/subscriptions/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       }
     })
       .then( e => {
@@ -82,7 +94,8 @@ class Api {
     return fetch(`/favorites`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       },
       body: JSON.stringify({
         id: id
@@ -99,7 +112,8 @@ class Api {
     return fetch(`/favorites/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken()
       }
     })
         .then( e => {

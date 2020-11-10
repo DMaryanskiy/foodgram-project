@@ -30,7 +30,7 @@ class IngredientsReceipe(models.Model):
 """
 
 class Receipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes_author")
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="receipe/")
@@ -47,3 +47,7 @@ class Receipe(models.Model):
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="follower")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")
+
+
+    class Meta:
+        unique_together = ['user', 'author']
