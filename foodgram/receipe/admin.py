@@ -3,7 +3,9 @@ from django.contrib import admin
 from .models import (
     Ingredients,
     IngredientsReceipe,
-    Receipe
+    Receipe,
+    Follow,
+    Favourite,
 )
 
 
@@ -43,3 +45,27 @@ class ReceipeAdmin(admin.ModelAdmin):
         "title",
     )
     inlines = (IngredientsReceipeInLine, )
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = (
+        "pk",
+        "user",
+        "author",
+    )
+    list_filter = (
+        "user",
+    )
+
+
+@admin.register(Favourite)
+class FavouriteAdmin(admin.ModelAdmin):
+    list_display = (
+        "pk",
+        "user",
+        "recipe",
+    )
+    list_filter = (
+        "user",
+    )

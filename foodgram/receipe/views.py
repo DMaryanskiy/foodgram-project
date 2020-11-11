@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .models import Receipe, Ingredients, IngredientsReceipe, User, Follow
+from .models import Receipe, Ingredients, IngredientsReceipe, User, Follow, Favourite
 from .forms import ReceipeForm
 from .utils import get_ingredients, food_time_filter
 
@@ -70,15 +70,10 @@ def profile(request, username):
     paginator = Paginator(recipe_list, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    if user.is_authenticated:
-        following = Follow.objects.filter(user=request.user, author=author)
-    else:
-        following = False
     return render(request, "profile.html", {
         "author" : author,
         "page" : page,
         "paginator" : paginator,
-        "following" : following,
     })
 
 def recipe_view(request, username, recipe_id):
@@ -109,18 +104,13 @@ def follow_index(request):
     )
 
 @login_required
-def profile_follow(request, username):
-    user = request.user
-    author = get_object_or_404(User, username=username)
-    exists = Follow.objects.filter(user=user, author=author).exists()
-    if user != author and not exists:
-        Follow.objects.create(user=user, author=author)
-    return redirect("profile", username=author)
-
-@login_required
-def profile_unfollow(request, username):
-    user = request.user
-    author = get_object_or_404(User, username=username)
-    follow = Follow.objects.filter(user=user, author=author)
-    follow.delete()
-    return redirect("profile", username=username)
+def favourite_index(request):
+    favourite = Favourite.objects.filter(user=request.user)
+    paginator = Paginator(favourite, 3)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    return render(request, "favourite.html", {
+            "page" : page,
+            "paginator" : paginator,
+        }
+    )

@@ -20,10 +20,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("receipe.urls")),
-    path("api/", include("api.urls")),
     path("auth/", include("users.urls")),
     path("auth/", include("django.contrib.auth.urls")),
+]
+
+urlpatterns += [
+    path("api/", include("api.urls")),
+    path("", include("receipe.urls")),
 ]
 
 if settings.DEBUG:

@@ -7,6 +7,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("add/receipe", views.add_receipe, name="add_receipe"),
     path("follow", views.follow_index, name="follow"),
+    path("favourite", views.favourite_index, name="favourite"),
     path("<username>", views.profile, name="profile"),
     path("<username>/<recipe_id>", views.recipe_view, name="recipe_view"),
 ]

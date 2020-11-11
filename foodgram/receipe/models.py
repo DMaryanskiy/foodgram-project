@@ -51,3 +51,8 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ['user', 'author']
+
+
+class Favourite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_favourite")
+    recipe = models.ForeignKey("Receipe", on_delete=models.CASCADE, related_name="recipe_favourite")

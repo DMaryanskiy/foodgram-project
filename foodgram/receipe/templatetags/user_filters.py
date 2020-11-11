@@ -1,6 +1,6 @@
 from django import template
 
-from receipe.models import Receipe
+from receipe.models import Receipe, Favourite, Follow
 
 register = template.Library()
 
@@ -8,11 +8,11 @@ register = template.Library()
 def addclass(field, css):
     return field.as_widget(attrs={"class" : css})
 
-@register.filter
+@register.filter(name="get_recipes")
 def get_recipes(author):
     return Receipe.objects.select_related("author").filter(author=author)[:3]
 
-@register.filter
+@register.filter(name="get_count_recipes")
 def get_count_recipes(author):
     count = author.recipes_author.count() - 3
     if count < 1:
@@ -27,3 +27,16 @@ def get_count_recipes(author):
 
     return f'Еще {count} {end}...'
 
+@register.filter(name="is_favourite")
+def is_favourite(recipe, user):
+    return Favourite.objects.select_related("recipe").filter(
+        user=user,
+        recipe=recipe,
+    ).exists()
+
+@register.filter(name="is_following")
+def is_following(author, user):
+    return Follow.objects.select_related("author").filter(
+        author=author,
+        user=user
+    ).exists()

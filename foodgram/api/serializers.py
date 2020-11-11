@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from receipe.models import Ingredients, Follow
+from receipe.models import Ingredients, Follow, Favourite
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -16,3 +16,13 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Follow
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    recipe = serializers.StringRelatedField()
+
+
+    class Meta:
+        fields = "__all__"
+        model = Favourite
