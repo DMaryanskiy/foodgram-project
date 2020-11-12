@@ -8,12 +8,9 @@ def get_ingredients(request):
     for key in dict(request.POST.items()):
         if "nameIngredient" in key:
             a = key.split("_")
-            if a[1].isdigit():
-                ingredients[dict(request.POST.items())[key]] = int(request.POST[
-                    f"valueIngredient_{a[1]}"]
-                )
-            else:
-                raise ValidationError("Количество ингредиентов должно быть числом!")
+            ingredients[dict(request.POST.items())[key]] = int(request.POST[
+                f"valueIngredient_{a[1]}"]
+            )
     return ingredients
 
 def food_time_filter(request, queryset):
