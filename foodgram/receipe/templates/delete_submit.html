@@ -1,19 +1,13 @@
-<!doctype html>
+{% extends "base.html" %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Удаление {{ recipe.title }}</title>
+{% block title %}Удаление рецепта{% endblock %}
+{% block static %}
     <link rel="stylesheet" href="{% static '/pages/index.css' %}">
-</head>
-<body class="body">
-<header class="header">
+{% endblock %}
+{% block nav %}
     {% include "nav.html" %}
-</header>
-<main class="main container">
+{% endblock %}
+{% block content %}
     <div class="custom-center-block">
         <p class="custom-text-block">Удалить рецепт {{ recipe.title }}?</p>
         <div class="custom-button-block">
@@ -26,7 +20,4 @@
             </form>
         </div>
     </div>
-</main>
-{% include "footer.html" %}
-</body>
-</html>
+{% endblock %}

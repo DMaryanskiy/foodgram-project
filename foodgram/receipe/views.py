@@ -8,16 +8,6 @@ from .models import Receipe, Ingredients, IngredientsReceipe, User, Follow, Favo
 from .forms import ReceipeForm
 from .utils import get_ingredients, food_time_filter
 
-@user_passes_test(lambda user: user.is_superuser)
-def ingredients(request):
-    with open("ingredients.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    for ingr in data:
-        ingredient = Ingredients(title=ingr["title"], dimension=ingr["dimension"])
-        ingredient.save()
-    return HttpResponse("\n".join(str(data)))
-
 def index(request):
     receipe = Receipe.objects.select_related("author").order_by("-pub_date").all()
     receipe_list, food_time = food_time_filter(request, receipe)
