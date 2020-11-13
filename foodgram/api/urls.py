@@ -9,12 +9,12 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'ingredients', IngredientListView)
+router.register(r"ingredients", IngredientListView)
 
 urlpatterns = [
-    path('subscriptions/<author_id>', api_follow_detail),
-    path('favourites/<recipe_id>', api_favourite_detail),
-    path('purchases/<recipe_id>', api_purchase_detail),
+    path("subscriptions/<author_id>", api_follow_detail),
+    path("favourites/<recipe_id>", api_favourite_detail),
+    path("purchases/<recipe_id>", api_purchase_detail),
 ]
 
 urlpatterns += router.urls

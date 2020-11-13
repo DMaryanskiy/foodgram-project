@@ -13,14 +13,14 @@ class Ingredients(models.Model):
 class IngredientsRecipe(models.Model):
     ingredient = models.ForeignKey("Ingredients", on_delete=models.CASCADE, related_name="ingredient")
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="recipe", null=True, blank=True)
-    amount = models.IntegerField()
+    amount = models.PositiveIntegerField()
 
     def __str__(self):
         return f'{self.ingredient.title} {self.amount} {self.ingredient.dimension}'
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes_author")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="recipe/")
