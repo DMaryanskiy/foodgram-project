@@ -1,6 +1,6 @@
 from django import template
 
-from receipe.models import Receipe, Favourite, Follow
+from receipe.models import Recipe, Favourite, Follow, Purchase
 
 register = template.Library()
 
@@ -10,7 +10,7 @@ def addclass(field, css):
 
 @register.filter(name="get_recipes")
 def get_recipes(author):
-    return Receipe.objects.select_related("author").filter(author=author)[:3]
+    return Recipe.objects.select_related("author").filter(author=author)[:3]
 
 @register.filter(name="get_count_recipes")
 def get_count_recipes(author):
@@ -39,4 +39,13 @@ def is_following(author, user):
     return Follow.objects.select_related("author").filter(
         author=author,
         user=user
+    ).exists()
+
+@register.filter(name="is_purchase")
+def is_purchase(recipe, buyer):
+    if not buyer.is_authenticated:
+        return False
+    return Purchase.objects.select_related("recipe").filter(
+        buyer=buyer,
+        recipe=recipe,
     ).exists()

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Список покупок{% endblock %}
+{% block static %}
+    <link rel="stylesheet" href="{% static '/pages/shopList.css' %}">
+{% endblock %}
+{% block nav %}
+    {% include "nav.html" with purchase=True %}
+{% endblock %}
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">Список покупок</h1>
+    </div>
+    <div class="card-list card-list_column">
+        {% csrf_token %}
+        <ul class="shopping-list">
+            {% for recipe in recipes %}
+            <li class="shopping-list__item" data-id="{{ recipe.recipe.pk }}">
+                <div class="recipe recipe_reverse">
+                    {% load thumbnail %}
+                    {% thumbnail recipe.recipe.image "250x250" crop="center" upscale=True as im %}
+                    <a href="{% url 'recipe_view' recipe.recipe.author.username recipe.recipe.pk %}">
+                    <img src="{{ im.url }}" alt="какой-то текст" class="recipe__image recipe__image_big">
+                    </a>
+                    {% endthumbnail %}
+                    <a href="{% url 'recipe_view' recipe.recipe.author.username recipe.recipe.pk %}">
+                    <h3 class="recipe__title">{{ recipe.recipe.title }}</h3>
+                    </a>
+                    <p class="recipe__text"><span class="icon-time"></span> {{ recipe.recipe.cooking_time }} мин.</p>
+                </div>
+                <a href="#" class="shopping-list__button link">Удалить</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'get_products' %}"><button class="button button_style_blue">Скачать список</button></a>
+    </div>
+
+    <script src="{% static '/js/config/config.js' %}"></script>
+    <script src="{% static '/js/components/Header.js' %}"></script>
+    <script src="{% static '/js/components/ShopList.js' %}"></script>
+    <script src="{% static '/js/api/Api.js' %}"></script>
+    <script src="{% static 'shopList.js' %}"></script>
+{% endblock %}

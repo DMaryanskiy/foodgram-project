@@ -2,15 +2,15 @@ from django.contrib import admin
 
 from .models import (
     Ingredients,
-    IngredientsReceipe,
-    Receipe,
+    IngredientsRecipe,
+    Recipe,
     Follow,
     Favourite,
 )
 
 
-class IngredientsReceipeInLine(admin.TabularInline):
-    model = IngredientsReceipe
+class IngredientsRecipeInLine(admin.TabularInline):
+    model = IngredientsRecipe
     extra = 1
 
 
@@ -22,11 +22,11 @@ class IngredientsAdmin(admin.ModelAdmin):
         "dimension",
     )
     list_filter = ("title", )
-    inlines = (IngredientsReceipeInLine, )
+    inlines = (IngredientsRecipeInLine, )
 
 
-@admin.register(IngredientsReceipe)
-class IngredientsReceipeAdmin(admin.ModelAdmin):
+@admin.register(IngredientsRecipe)
+class IngredientsRecipeAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "ingredient",
@@ -34,8 +34,8 @@ class IngredientsReceipeAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Receipe)
-class ReceipeAdmin(admin.ModelAdmin):
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "author",
@@ -44,7 +44,7 @@ class ReceipeAdmin(admin.ModelAdmin):
         "author",
         "title",
     )
-    inlines = (IngredientsReceipeInLine, )
+    inlines = (IngredientsRecipeInLine, )
 
 
 @admin.register(Follow)

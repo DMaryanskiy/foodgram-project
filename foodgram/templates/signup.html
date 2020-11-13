@@ -1,20 +1,14 @@
-<!doctype html>
+{% extends "base.html" %}
 {% load static %}
 {% load user_filters %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Регистрация</title>
+{% block title %}Регистрация{% endblock %}
+{% block static %}
     <link rel="stylesheet" href="{% static '/pages/form.css' %}">
-</head>
-<body class="body">
-<header class="header">
+{% endblock %}
+{% block nav %}
     {% include "nav.html" %}
-</header>
-<main class="main container">
+{% endblock %}
+{% block content %}
     <div class="main__header">
         <h1 class="main__title">Регистрация</h1>
     </div>
@@ -27,6 +21,9 @@
                 <div class="form__field-group">
                     <!--input type="text" name="first_name" id="id_first_name" class="form__input"-->
                     {{ field|addclass:"form__input" }}
+                {% if field.help_text %}
+                    <span class="form__input-info">{{ field.help_text|safe }}</span>
+                {% endif %}
                 {% if form.errors %}
                     {% for error in field.errors %}
                     <span class="form__error">{{ error|escape }}</span>
@@ -35,11 +32,10 @@
                 </div>
             </div>
             {% endfor %}
+            <div class="form__footer">
+                <button type="submit" class="button button_style_blue">Создать аккаунт</button>
+            </div>
         </form>
     </div>
 
-
-</main>
-{% include "footer.html" %}
-</body>
-</html>
+{% endblock %}

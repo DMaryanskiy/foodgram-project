@@ -1,17 +1,25 @@
-import json
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .models import Receipe, Ingredients, IngredientsReceipe, User, Follow, Favourite
-from .forms import ReceipeForm
+from .models import (
+    Recipe,
+    Ingredients,
+    IngredientsRecipe,
+    User,
+    Follow,
+    Favourite,
+    Purchase,
+)
+from .forms import RecipeForm
 from .utils import get_ingredients, food_time_filter
 
 def index(request):
-    receipe = Receipe.objects.select_related("author").order_by("-pub_date").all()
-    receipe_list, food_time = food_time_filter(request, receipe)
-    paginator = Paginator(receipe_list, 3)
+    recipe = Recipe.objects.select_related("author").order_by("-pub_date").all()
+    recipe_list, food_time = food_time_filter(request, recipe)
+    paginator = Paginator(recipe_list, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(
@@ -23,40 +31,41 @@ def index(request):
     )
 
 @login_required
-def add_receipe(request):
+def add_recipe(request):
     user = User.objects.get(username=request.user)
     if request.method == "POST":
         ingr = get_ingredients(request)
-        form = ReceipeForm(request.POST or None, files=request.FILES or None)
+        form = RecipeForm(request.POST or None, files=request.FILES or None)
         if not ingr:
             form.add_error(None, 'Добавьте ингредиенты')
 
         elif form.is_valid():
-            receipe = form.save(commit=False)
-            receipe.author = user
-            receipe.save()
+            recipe = form.save(commit=False)
+            recipe.author = user
+            recipe.save()
             for ingr_name, amount in ingr.items():
                 ingr_obj = get_object_or_404(Ingredients, title=ingr_name)
-                ingr_receipe = IngredientsReceipe(
+                ingr_recipe = IngredientsRecipe(
                     ingredient=ingr_obj,
-                    receipe=receipe,
+                    recipe=recipe,
                     amount=amount,
                 )
-                ingr_receipe.save()
+                ingr_recipe.save()
             form.save_m2m()
             return redirect("index")
     
     else:
-        form = ReceipeForm()
-    return render(request, "receipeform.html", {
+        form = RecipeForm()
+    return render(request, "recipeform.html", {
         "form" : form,
     })
 
 def profile(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
-    recipe = Receipe.objects.filter(author=author)
-    recipe_list = recipe.order_by("-pub_date")
+    recipe = Recipe.objects.select_related("author").filter(author=author)
+    recipe_list, food_time = food_time_filter(request, recipe)
+    recipe_list = recipe_list.order_by("-pub_date")
     paginator = Paginator(recipe_list, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -64,28 +73,29 @@ def profile(request, username):
         "author" : author,
         "page" : page,
         "paginator" : paginator,
+        "food_time" : food_time,
     })
 
 def recipe_view(request, username, recipe_id):
     author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(Receipe, pk=recipe_id, author=author)
-    ingredients = IngredientsReceipe.objects.filter(receipe=recipe)
+    recipe = get_object_or_404(Recipe, pk=recipe_id, author=author)
+    ingredients = IngredientsRecipe.objects.filter(recipe=recipe)
     return render(request, "single_recipe.html", {
         "recipe" : recipe,
         "username" : author,
-        "ingredients" : ingredients
+        "ingredients" : ingredients,
     })
 
 @login_required
 def recipe_edit(request, username, recipe_id):
     change = True
     profile = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(Receipe, pk=recipe_id, author=profile)
-    ingr_objects = IngredientsReceipe.objects.filter(receipe=recipe)
+    recipe = get_object_or_404(Recipe, pk=recipe_id, author=profile)
+    ingr_objects = IngredientsRecipe.objects.filter(recipe=recipe)
 
     if request.method == "POST":
         ingr = get_ingredients(request)
-        form = ReceipeForm(
+        form = RecipeForm(
             request.POST or None,
             files=request.FILES or None,
             instance=recipe,
@@ -95,25 +105,25 @@ def recipe_edit(request, username, recipe_id):
             form.add_error(None, "Добавьте ингредиенты!")
 
         elif form.is_valid():
-            receipe = form.save(commit=False)
-            receipe.author = profile
-            receipe.save()
-            IngredientsReceipe.objects.filter(receipe=recipe).delete()
+            recipe = form.save(commit=False)
+            recipe.author = profile
+            recipe.save()
+            IngredientsRecipe.objects.filter(recipe=recipe).delete()
 
             for ingr_name, amount in ingr.items():
                 ingr_obj = get_object_or_404(Ingredients, title=ingr_name)
-                ingr_receipe = IngredientsReceipe(
+                ingr_recipe = IngredientsRecipe(
                     ingredient=ingr_obj,
-                    receipe=receipe,
+                    recipe=recipe,
                     amount=amount,
                 )
-                ingr_receipe.save()
+                ingr_recipe.save()
             form.save_m2m()
             return redirect("index")
     
     else:
-        form = ReceipeForm(instance=recipe)
-    return render(request, "receipeform.html", {
+        form = RecipeForm(instance=recipe)
+    return render(request, "recipeform.html", {
         "form" : form,
         "recipe" : recipe,
         "ingr" : ingr_objects,
@@ -122,7 +132,7 @@ def recipe_edit(request, username, recipe_id):
 
 @login_required
 def recipe_delete(request, username, recipe_id):
-    recipe = get_object_or_404(Receipe, pk=recipe_id)
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
     user = request.user
 
     if request.method == "POST":
@@ -142,7 +152,7 @@ def follow_index(request):
     follow = Follow.objects.filter(user=request.user)
     cnt = {}
     for author in follow:
-        amount = Receipe.objects.filter(author=author.author).count()
+        amount = Recipe.objects.filter(author=author.author).count()
         cnt[author.author] = amount
     paginator = Paginator(follow, 3)
     page_number = request.GET.get("page")
@@ -156,12 +166,44 @@ def follow_index(request):
 
 @login_required
 def favourite_index(request):
-    favourite = Favourite.objects.filter(user=request.user)
-    paginator = Paginator(favourite, 3)
+    recipe = Recipe.objects.select_related("author").filter(
+        recipe_favourite__user__pk=request.user.id)
+    recipes, food_time = food_time_filter(request, recipe)
+    paginator = Paginator(recipes, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(request, "favourite.html", {
             "page" : page,
             "paginator" : paginator,
+            "food_time" : food_time,
         }
     )
+
+@login_required
+def purchase_list(request):
+    recipes = Purchase.objects.filter(buyer=request.user)
+    return render(request, "shop_list.html",{
+        "recipes" : recipes,
+    })
+
+@login_required
+def upload(request):
+    recipes = Recipe.objects.filter(pur_recipe__buyer=request.user)
+    ingredients = recipes.values(
+        "ingredient_list__title",
+        "ingredient_list__dimension",
+    ).annotate(
+        total_amount=Sum("recipe__amount")
+    )
+    file_data = ""
+
+    for i in ingredients:
+        line = " ".join(str(value) for value in i.values())
+        file_data += line + "\n"
+    
+    response = HttpResponse(
+        file_data,
+        content_type="application/text charset=utf-8",
+    )
+    response["Content-Disposition"] = "attachment; filename='products.txt'"
+    return response

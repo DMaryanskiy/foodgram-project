@@ -1,21 +1,16 @@
-<!doctype html>
+{% extends "base.html" %}
 {% load static %}
-{% csrf_token %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ recipe.title }}</title>
+{% load user_filters %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block static %}
     <link rel="stylesheet" href="{% static '/pages/single.css' %}">
-</head>
-<body class="body">
-<header class="header">
+{% endblock %}
+{% block nav %}
     {% include "nav.html" with index=True %}
-</header>
-    <main class="main container">
+{% endblock %}
+{% block content %}
         <div class="single-card" data-id="{{ recipe.pk }}" data-author="{{ recipe.author.pk }}">
+            {% csrf_token %}
             {% load thumbnail %}
             {% thumbnail recipe.image "1920x1080" crop="center" upscale=True as im %}
             <img src="{{ im.url }}" alt="какой-то текст" class="single-card__image">
@@ -43,13 +38,26 @@
                     <p class="single-card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                     <ul class="single-card__items">
                         <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span> {{ recipe.author }}</p></li>
-                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="#" class="single-card__text">{% if user == recipe.author %}Редактировать рецепт{% endif %}</a></li>
+                        {% if user == recipe.author %}
+                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipe_edit' username=recipe.author.username recipe_id=recipe.pk %}" class="single-card__text">Редактировать рецепт</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <ul class="single-card__items">
-                    <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
-                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
-                </ul>
+                    {% if user.is_authenticated %}
+                        {% if recipe|is_purchase:user %}
+                            <li class="single-card__item"><button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен </button></li>
+                        {% else %}
+                            <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки </button></li>
+                        {% endif %}
+                        {% if recipe.author != user %}
+                            {% if recipe.author|is_following:user %}
+                                <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe"> Отписаться от автора </button></li>
+                            {% else %}                 
+                                <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out> Подписаться на автора </button></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}                </ul>
                 <div class="single-card__section">
                     <h3 class="single-card__section-title">Ингридиенты:</h3>
                     <div class="single-card__items single-card__items_column">
@@ -64,8 +72,6 @@
                 </div>
             </div>
         </div>
-    </main>
-    {% include "footer.html" %}
 <script src="{% static '/js/components/Purchases.js' %}"></script>
 <script src="{% static '/js/components/Favorites.js' %}"></script>
 <script src="{% static '/js/components/Subscribe.js' %}"></script>
@@ -77,5 +83,4 @@
 
 <script src="{% static '/js/api/Api.js' %}"></script>
 <script src="{% static 'singlePage.js' %}"></script>
-</body>
-</html>
+{% endblock %}

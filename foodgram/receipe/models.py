@@ -10,33 +10,22 @@ class Ingredients(models.Model):
         return "%s %s" % (self.title, self.dimension)
 
 
-class IngredientsReceipe(models.Model):
+class IngredientsRecipe(models.Model):
     ingredient = models.ForeignKey("Ingredients", on_delete=models.CASCADE, related_name="ingredient")
-    receipe = models.ForeignKey("Receipe", on_delete=models.CASCADE, related_name="receipe", null=True, blank=True)
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="recipe", null=True, blank=True)
     amount = models.IntegerField()
 
     def __str__(self):
         return f'{self.ingredient.title} {self.amount} {self.ingredient.dimension}'
 
 
-"""class Tag(models.Model):
-    name = models.CharField(max_length=10)
-    slug = models.SlugField(max_length=10)
-    color = models.CharField(max_length=20)
-    value = models.IntegerField(default=1)
-
-    def __str__(self):
-        return "%s" % (self.name)
-"""
-
-class Receipe(models.Model):
+class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes_author")
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="receipe/")
+    image = models.ImageField(upload_to="recipe/")
     descriptions = models.TextField()
-    ingredient_list = models.ManyToManyField("Ingredients", through="IngredientsReceipe")
-    # tag = models.ManyToManyField("Tag", related_name="tag")
+    ingredient_list = models.ManyToManyField("Ingredients", related_name="recipes", through="IngredientsRecipe")
     cooking_time = models.PositiveIntegerField()
 
     breakfast = models.BooleanField(default=False, verbose_name="Завтрак")
@@ -55,4 +44,8 @@ class Follow(models.Model):
 
 class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_favourite")
-    recipe = models.ForeignKey("Receipe", on_delete=models.CASCADE, related_name="recipe_favourite")
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="recipe_favourite")
+
+class Purchase(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="buyer")
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="pur_recipe")

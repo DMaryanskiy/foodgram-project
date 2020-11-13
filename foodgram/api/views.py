@@ -1,5 +1,6 @@
-from rest_framework import mixins, viewsets, filters, generics, status
+from rest_framework import mixins, viewsets, filters, status
 from rest_framework.decorators import api_view
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from django.db.utils import IntegrityError
@@ -8,8 +9,16 @@ from .serializers import (
     IngredientSerializer,
     FollowSerializer,
     FavouriteSerializer,
+    PurchaseSerializer,
 )
-from receipe.models import Ingredients, Follow, User, Receipe, Favourite
+from receipe.models import (
+    Ingredients,
+    Follow,
+    User,
+    Recipe,
+    Favourite,
+    Purchase,
+)
 
 
 class IngredientListView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -20,42 +29,62 @@ class IngredientListView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 @api_view(["POST", "DELETE"])
 def api_follow_detail(request, author_id):
-    author = generics.get_object_or_404(User, pk=author_id)
+    author = get_object_or_404(User, pk=author_id)
     if request.method == "POST":
-        serializer = FollowSerializer(data=request.data)
-
-        if serializer.is_valid():
-            try:
-                serializer.save(user=request.user, author=author)
-            except IntegrityError:
-                Response({"success" : False}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"success" : True}, status=status.HTTP_201_CREATED)
-        return  Response({"success" : False}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = FollowSerializer(data=request.data, context={
+            "request_user" : request.user,
+            "request_author" : author,
+        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, author=author)
+        return Response({"success" : True}, status=status.HTTP_201_CREATED)
     
     if request.method == "DELETE":
-        follow = generics.get_object_or_404(Follow, user=request.user, author=author)
-        follow.delete()
+        get_object_or_404(
+            Follow,
+            user=request.user,
+            author=author
+        ).delete()
         return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(["POST", "DELETE"])
 def api_favourite_detail(request, recipe_id):
-    recipe = generics.get_object_or_404(Receipe, pk=recipe_id)
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
     if request.method == "POST":
-        serializer = FavouriteSerializer(data=request.data)
-
-        if serializer.is_valid():
-            try:
-                serializer.save(user=request.user, recipe=recipe)
-            except IntegrityError:
-                Response({"success" : False}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"success" : True}, status=status.HTTP_201_CREATED)
-        return Response({"success" : False}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = FavouriteSerializer(data=request.data, context={
+            "request_user" : request.user,
+            "request_recipe" : recipe,
+        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, recipe=recipe)
+        return Response({"success" : True}, status=status.HTTP_201_CREATED)
+    
 
     if request.method == "DELETE":
-        favourite = generics.get_object_or_404(
+        get_object_or_404(
             Favourite,
             user=request.user,
             recipe=recipe
-        )
-        favourite.delete()
+        ).delete()
+        return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["POST", "DELETE"])
+def api_purchase_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+
+    if request.method == "POST":
+        serializer = PurchaseSerializer(data=request.data, context={
+            "request_user" : request.user,
+            "request_recipe" : recipe,
+        })
+        serializer.is_valid(raise_exception=True)
+        serializer.save(buyer=request.user, recipe=recipe)
+        return Response({"success" : True}, status=status.HTTP_201_CREATED)
+
+    if request.method == "DELETE":
+        get_object_or_404(
+            Purchase,
+            buyer=request.user,
+            recipe=recipe
+        ).delete()
         return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
