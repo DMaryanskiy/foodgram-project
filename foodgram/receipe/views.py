@@ -10,25 +10,28 @@ from .models import (
     IngredientsRecipe,
     User,
     Follow,
-    Favourite,
     Purchase,
 )
 from .forms import RecipeForm
 from .utils import get_ingredients, food_time_filter
 
+
 def index(request):
-    recipe = Recipe.objects.select_related("author").order_by("-pub_date").all()
+    recipe = Recipe.objects.select_related(
+        "author"
+    ).order_by("-pub_date").all()
     recipe_list, food_time = food_time_filter(request, recipe)
     paginator = Paginator(recipe_list, 3)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(
         request, "index.html", {
-            "page" : page,
-            "paginator" : paginator,
-            "food_time" : food_time,
+            "page": page,
+            "paginator": paginator,
+            "food_time": food_time,
         }
     )
+
 
 @login_required
 def add_recipe(request):
@@ -53,15 +56,15 @@ def add_recipe(request):
                 ingr_recipe.save()
             form.save_m2m()
             return redirect("index")
-    
+
     else:
         form = RecipeForm()
     return render(request, "recipeform.html", {
-        "form" : form,
+        "form": form,
     })
 
+
 def profile(request, username):
-    user = request.user
     author = get_object_or_404(User, username=username)
     recipe = Recipe.objects.select_related("author").filter(author=author)
     recipe_list, food_time = food_time_filter(request, recipe)
@@ -70,21 +73,23 @@ def profile(request, username):
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(request, "profile.html", {
-        "author" : author,
-        "page" : page,
-        "paginator" : paginator,
-        "food_time" : food_time,
+        "author": author,
+        "page": page,
+        "paginator": paginator,
+        "food_time": food_time,
     })
+
 
 def recipe_view(request, username, recipe_id):
     author = get_object_or_404(User, username=username)
     recipe = get_object_or_404(Recipe, pk=recipe_id, author=author)
     ingredients = IngredientsRecipe.objects.filter(recipe=recipe)
     return render(request, "single_recipe.html", {
-        "recipe" : recipe,
-        "username" : author,
-        "ingredients" : ingredients,
+        "recipe": recipe,
+        "username": author,
+        "ingredients": ingredients,
     })
+
 
 @login_required
 def recipe_edit(request, username, recipe_id):
@@ -100,7 +105,7 @@ def recipe_edit(request, username, recipe_id):
             files=request.FILES or None,
             instance=recipe,
         )
-    
+
         if not ingr_objects:
             form.add_error(None, "Добавьте ингредиенты!")
 
@@ -120,15 +125,16 @@ def recipe_edit(request, username, recipe_id):
                 ingr_recipe.save()
             form.save_m2m()
             return redirect("index")
-    
+
     else:
         form = RecipeForm(instance=recipe)
     return render(request, "recipeform.html", {
-        "form" : form,
-        "recipe" : recipe,
-        "ingr" : ingr_objects,
-        "change" : change,
+        "form": form,
+        "recipe": recipe,
+        "ingr": ingr_objects,
+        "change": change,
     })
+
 
 @login_required
 def recipe_delete(request, username, recipe_id):
@@ -142,10 +148,11 @@ def recipe_delete(request, username, recipe_id):
         return redirect("index")
     else:
         return render(request, "delete_submit.html", {
-            "recipe_id" : recipe_id,
-            "username" : username,
-            "recipe" : recipe,
+            "recipe_id": recipe_id,
+            "username": username,
+            "recipe": recipe,
         })
+
 
 @login_required
 def follow_index(request):
@@ -158,11 +165,12 @@ def follow_index(request):
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(request, "follow.html", {
-            "page" : page,
-            "paginator" : paginator,
-            "cnt" : cnt,
+            "page": page,
+            "paginator": paginator,
+            "cnt": cnt,
         }
     )
+
 
 @login_required
 def favourite_index(request):
@@ -173,18 +181,20 @@ def favourite_index(request):
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     return render(request, "favourite.html", {
-            "page" : page,
-            "paginator" : paginator,
-            "food_time" : food_time,
+            "page": page,
+            "paginator": paginator,
+            "food_time": food_time,
         }
     )
+
 
 @login_required
 def purchase_list(request):
     recipes = Purchase.objects.filter(buyer=request.user)
-    return render(request, "shop_list.html",{
-        "recipes" : recipes,
+    return render(request, "shop_list.html", {
+        "recipes": recipes,
     })
+
 
 @login_required
 def upload(request):
@@ -200,7 +210,7 @@ def upload(request):
     for i in ingredients:
         line = " ".join(str(value) for value in i.values())
         file_data += line + "\n"
-    
+
     response = HttpResponse(
         file_data,
         content_type="application/text charset=utf-8",

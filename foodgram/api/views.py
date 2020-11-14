@@ -3,8 +3,6 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from django.db.utils import IntegrityError
-
 from .serializers import (
     IngredientSerializer,
     FollowSerializer,
@@ -27,38 +25,39 @@ class IngredientListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["title", ]
 
+
 @api_view(["POST", "DELETE"])
 def api_follow_detail(request, author_id):
     author = get_object_or_404(User, pk=author_id)
     if request.method == "POST":
         serializer = FollowSerializer(data=request.data, context={
-            "request_user" : request.user,
-            "request_author" : author,
+            "request_user": request.user,
+            "request_author": author,
         })
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user, author=author)
-        return Response({"success" : True}, status=status.HTTP_201_CREATED)
-    
+        return Response({"success": True}, status=status.HTTP_201_CREATED)
+
     if request.method == "DELETE":
         get_object_or_404(
             Follow,
             user=request.user,
             author=author
         ).delete()
-        return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
+
 
 @api_view(["POST", "DELETE"])
 def api_favourite_detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
     if request.method == "POST":
         serializer = FavouriteSerializer(data=request.data, context={
-            "request_user" : request.user,
-            "request_recipe" : recipe,
+            "request_user": request.user,
+            "request_recipe": recipe,
         })
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user, recipe=recipe)
-        return Response({"success" : True}, status=status.HTTP_201_CREATED)
-    
+        return Response({"success": True}, status=status.HTTP_201_CREATED)
 
     if request.method == "DELETE":
         get_object_or_404(
@@ -66,7 +65,8 @@ def api_favourite_detail(request, recipe_id):
             user=request.user,
             recipe=recipe
         ).delete()
-        return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
+
 
 @api_view(["POST", "DELETE"])
 def api_purchase_detail(request, recipe_id):
@@ -74,12 +74,12 @@ def api_purchase_detail(request, recipe_id):
 
     if request.method == "POST":
         serializer = PurchaseSerializer(data=request.data, context={
-            "request_user" : request.user,
-            "request_recipe" : recipe,
+            "request_user": request.user,
+            "request_recipe": recipe,
         })
         serializer.is_valid(raise_exception=True)
         serializer.save(buyer=request.user, recipe=recipe)
-        return Response({"success" : True}, status=status.HTTP_201_CREATED)
+        return Response({"success": True}, status=status.HTTP_201_CREATED)
 
     if request.method == "DELETE":
         get_object_or_404(
@@ -87,4 +87,4 @@ def api_purchase_detail(request, recipe_id):
             buyer=request.user,
             recipe=recipe
         ).delete()
-        return Response({"success" : True}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)

@@ -22,7 +22,6 @@ class FavouriteSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     recipe = serializers.StringRelatedField()
 
-
     class Meta:
         fields = "__all__"
         model = Favourite
@@ -31,7 +30,6 @@ class FavouriteSerializer(serializers.ModelSerializer):
 class PurchaseSerializer(serializers.ModelSerializer):
     buyer = serializers.StringRelatedField()
     recipe = serializers.StringRelatedField()
-
 
     class Meta:
         fields = "__all__"
