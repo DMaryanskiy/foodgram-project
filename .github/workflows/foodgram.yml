@@ -54,7 +54,7 @@ jobs:
             script: |
                 sudo docker pull dmaryanskiy/diplom:v1.0.0
                 sudo docker stop $(sudo docker ps -a -q)
-                sudo docker run --rm -d -p 8000:8000 dmaryanskiy/diplom:v1.0.0
+                sudo docker run --rm -d -p 8001:8000 dmaryanskiy/diplom:v1.0.0
 
 
     send_message:
