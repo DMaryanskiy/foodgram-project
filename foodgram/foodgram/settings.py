@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,17 +29,12 @@ SECRET_KEY = '^1w)bi3ux*5q06s$n(ff=v!)fg1%@hfislhc*m%htdw^dk6+!-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', '0.0.0.0']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'receipe',
-    'users',
-    'api.apps.ApiConfig',
-    'rest_framework',
-    'django_filters',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.admin',
@@ -45,6 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
+    'rest_framework',
+    'django_filters',
+    'receipe',
+    'users',
+    'api.apps.ApiConfig',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -83,8 +88,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 

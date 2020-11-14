@@ -1,5 +1,7 @@
 from django.db import models
-from users.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Ingredients(models.Model):
@@ -45,6 +47,7 @@ class Follow(models.Model):
 class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_favourite")
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="recipe_favourite")
+
 
 class Purchase(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="buyer")

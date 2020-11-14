@@ -1,0 +1,39 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+  static_web:
+  media_web:
+
+services:
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql_diplom/data/
+    env_file:
+      - ./.env
+  
+  web:
+    build: .
+    restart: always
+    expose:
+      - '8000'
+    volumes:
+      - static_web:/code/foodgram/static/
+      - media_web:/code/foodgram/media/
+    depends_on:
+      - db
+    command: bash -c "python manage.py collectstatic --noinput && python manage.py makemigrations --noinput && python manage.py migrate --noinput && gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000"
+    env_file:
+      - ./.env
+  
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - '80:80'
+    volumes:
+      - static_web:/code/static/
+      - media_web:/code/media/
+    depends_on:
+      - web
