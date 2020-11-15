@@ -19,8 +19,8 @@ services:
     expose:
       - '8000'
     volumes:
-      - static_web:/code/foodgram/static/
-      - media_web:/code/foodgram/media/
+      - static_web:/code/static/
+      - media_web:/code/media/
     depends_on:
       - db
     command: bash -c "python manage.py collectstatic --noinput && python manage.py makemigrations --noinput && python manage.py migrate --noinput && gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000"
